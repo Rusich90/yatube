@@ -47,18 +47,32 @@ def profile(request, username):
     paginator = Paginator(author_post_list, 5)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
+    user = request.user.username
 
-    return render(request, 'profile.html', {"author": author, 'page': page, 'paginator': paginator})
+    return render(request, 'profile.html', {"author": author, 'page': page, 'paginator': paginator, "user": user})
 
 
-#def post_view(request, username, post_id):
+def post_view(request, username, post_id):
     # тут тело функции
-#    return render(request, 'post.html', {})
+    author = get_object_or_404(User, username=username)
+    author_post = author.posts.get(id=post_id)
+    author_post_list = author.posts.all()
+    paginator = Paginator(author_post_list, 5)
+    user = request.user.username
+
+    return render(request, 'post.html', {"author": author, 'author_post': author_post, 'paginator': paginator, "user": user})
 
 
-#def post_edit(request, username, post_id):
-    # тут тело функции. Не забудьте проверить,
-    # что текущий пользователь — это автор записи.
+def post_edit(request, username, post_id):
+    author = get_object_or_404(User, username=username)
+    if author.username == request.user.username:
+        post = get_object_or_404(Post, id=post_id)
+        #if request.method == "POST":
+
+            #author_post = author.posts.get(id=post_id)
+            #return render(request, 'new_post.html', {"author": author, 'author_post': author_post})
+        form = PostForm(instance=post)
+        return render(request, {"form": form})
     # В качестве шаблона страницы редактирования укажите шаблон создания новой записи
     # который вы создали раньше (вы могли назвать шаблон иначе)
-#    return render(request, 'post_new.html', {})
+    return redirect('index')

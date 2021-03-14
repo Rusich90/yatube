@@ -49,9 +49,11 @@
                                     <div class="d-flex justify-content-between align-items-center">
                                             <div class="btn-group ">
                                                     <!-- Ссылка на страницу записи в атрибуте href-->
-                                                    <a class="btn btn-sm text-muted" href="/leo/37/" role="button">Добавить комментарий</a>
+                                                    <a class="btn btn-sm text-muted" href="/{{ author.username }}/{{ post.id }}/" role="button">Добавить комментарий</a>
                                                     <!-- Ссылка на редактирование, показывается только автору записи -->
-                                                    <a class="btn btn-sm text-muted" href="/leo/37/edit" role="button">Редактировать</a>
+                                                    {% if author.username == user %}
+                                                    <a class="btn btn-sm text-muted" href="/{{ author.username }}/{{ post.id }}/edit" role="button">Редактировать</a>
+                                                    {% endif %}
                                             </div>
                                             <!-- Дата публикации  -->
                                             <small class="text-muted"> {{ post.pub_date|date:"d M Y г. H:i" }}</small>
