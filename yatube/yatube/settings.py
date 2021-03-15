@@ -25,7 +25,12 @@ SECRET_KEY = 'd0%1d7$d-&o6!9+_4a3ia=)m#d*a8h7lo=42xx2@yb(*v+z)f0'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+        "localhost",
+        "127.0.0.1",
+        "[::1]",
+        "testserver",
+]
 
 
 # Application definition
@@ -34,6 +39,8 @@ INSTALLED_APPS = [
     'django_extensions',
     'users',
     'posts',
+    'django.contrib.sites',
+    'django.contrib.flatpages',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -112,6 +119,8 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = 'ru'
 
 TIME_ZONE = 'UTC'
+
+SITE_ID = 1
 
 USE_I18N = True
 

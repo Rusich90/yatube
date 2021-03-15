@@ -7,7 +7,11 @@
 <div class="row justify-content-center">
     <div class="col-md-8 p-5">
         <div class="card">
-            <div class="card-header">Опубликовать новый пост</div>
+            {% if request.get_full_path == "/new/" %}
+            <div class="card-header">Добавить запись</div>
+            {% else %}
+            <div class="card-header">Редактировать запись</div>
+            {% endif %}
             <div class="card-body">
                 
               {% for error in form.errors %}
@@ -36,7 +40,11 @@
 
                     <div class="col-md-6 offset-md-4">              
                             <button type="submit" class="btn btn-primary">
-                                Опубликовать
+                                {% if request.get_full_path == "/new/" %}
+                                Добавить
+                                {% else %}
+                                Сохранить
+                                {% endif %}
                             </button>
                     </div>
                 </form>
