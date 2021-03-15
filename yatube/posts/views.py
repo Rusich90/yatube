@@ -72,11 +72,11 @@ def post_edit(request, username, post_id):
             if form.is_valid():
                 post = form.save()
                 post.save()
-                return redirect('index')
+                return redirect('post', username=username, post_id=post_id)
 
             return render(request, 'new_post.html', {"form": form})
+
         form = PostForm(instance=post)
         return render(request, 'new_post.html', {"form": form})
-    # В качестве шаблона страницы редактирования укажите шаблон создания новой записи
-    # который вы создали раньше (вы могли назвать шаблон иначе)
-    return redirect('index')
+
+    return redirect('post', username=username, post_id=post_id)
