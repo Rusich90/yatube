@@ -67,12 +67,16 @@ def post_edit(request, username, post_id):
     author = get_object_or_404(User, username=username)
     if author.username == request.user.username:
         post = get_object_or_404(Post, id=post_id)
-        #if request.method == "POST":
+        if request.method == "POST":
+            form = PostForm(request.POST, instance=post)
+            if form.is_valid():
+                post = form.save()
+                post.save()
+                return redirect('index')
 
-            #author_post = author.posts.get(id=post_id)
-            #return render(request, 'new_post.html', {"author": author, 'author_post': author_post})
+            return render(request, 'new_post.html', {"form": form})
         form = PostForm(instance=post)
-        return render(request, {"form": form})
+        return render(request, 'new_post.html', {"form": form})
     # В качестве шаблона страницы редактирования укажите шаблон создания новой записи
     # который вы создали раньше (вы могли назвать шаблон иначе)
     return redirect('index')
