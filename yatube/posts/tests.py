@@ -1,5 +1,5 @@
 from django.test import TestCase, Client
-
+from .models import Post, User
 
 class ProfileTest(TestCase):
     def setUp(self):
@@ -10,6 +10,6 @@ class ProfileTest(TestCase):
     def test_profile(self):
         response = self.client.get('/test_user/')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.context["posts"]), 1)
+        self.assertEqual(len(response.context["page"]), 1)
         self.assertIsInstance(response.context["profile"], User)
         self.assertEqual(response.context["profile"].username, self.user.username)
