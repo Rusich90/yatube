@@ -24,6 +24,7 @@ class Post(models.Model):
                               verbose_name='Группа',
                               help_text='Выберите группу для поста (необязательно)',
                               blank=True, null=True)
+    image = models.ImageField(upload_to='posts/', blank=True, null=True)
 
     def __str__(self):
         # выводим текст поста
