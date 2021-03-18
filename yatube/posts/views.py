@@ -27,18 +27,13 @@ def group_posts(request, slug):
 
 @login_required
 def new_post(request):
-    if request.method == "POST":
-        form = PostForm(request.POST)
-        if form.is_valid():
-            text = form.cleaned_data['text']
-            group = form.cleaned_data['group']
-            Post.objects.create(author=request.user, group=group, text=text)
-            return redirect('index')
-
+    form = PostForm(request.POST or None)
+    if not form.is_valid():
         return render(request, 'new_post.html', {"form": form})
-
-    form = PostForm()
-    return render(request, 'new_post.html', {"form": form})
+    text = form.cleaned_data['text']
+    group = form.cleaned_data['group']
+    Post.objects.create(author=request.user, group=group, text=text)
+    return redirect('index')
 
 
 def profile(request, username):
@@ -53,7 +48,6 @@ def profile(request, username):
 
 
 def post_view(request, username, post_id):
-    # тут тело функции
     author = get_object_or_404(User, username=username)
     author_post = author.posts.get(id=post_id)
     author_post_list = author.posts.all()
@@ -62,7 +56,7 @@ def post_view(request, username, post_id):
 
     return render(request, 'post.html', {"author": author, 'author_post': author_post, 'paginator': paginator, "user": user})
 
-
+@login_required
 def post_edit(request, username, post_id):
     author = get_object_or_404(User, username=username)
     if author.username == request.user.username:

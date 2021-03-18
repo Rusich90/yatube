@@ -10,11 +10,11 @@
                             <div class="card-body">
                                     <div class="h2">
                                         <!-- Имя автора -->
-                                        {{ author.first_name }} {{ author.last_name }}
+                                        {{ profile.first_name }} {{ profile.last_name }}
                                     </div>
                                     <div class="h3 text-muted">
                                          <!-- username автора -->
-                                         @{{ author.username }}
+                                         @{{ profile.username }}
                                     </div>
                             </div>
                             <ul class="list-group list-group-flush">
@@ -42,17 +42,17 @@
                             <div class="card-body">
                                     <p class="card-text">
                                             <!-- Ссылка на страницу автора в атрибуте href; username автора в тексте ссылки -->
-                                            <a href="/{{ author.username }}/"><strong class="d-block text-gray-dark">@{{ author.username }}</strong></a>
+                                            <a href="/{{ profile.username }}/"><strong class="d-block text-gray-dark">@{{ profile.username }}</strong></a>
                                             <!-- Текст поста -->
                                             {{ post.text|linebreaksbr }}
                                     </p>
                                     <div class="d-flex justify-content-between align-items-center">
                                             <div class="btn-group ">
                                                     <!-- Ссылка на страницу записи в атрибуте href-->
-                                                    <a class="btn btn-sm text-muted" href="/{{ author.username }}/{{ post.id }}/" role="button">Добавить комментарий</a>
+                                                    <a class="btn btn-sm text-muted" href="/{{ profile.username }}/{{ post.id }}/" role="button">Добавить комментарий</a>
                                                     <!-- Ссылка на редактирование, показывается только автору записи -->
-                                                    {% if author.username == user %}
-                                                    <a class="btn btn-sm text-muted" href="/{{ author.username }}/{{ post.id }}/edit" role="button">Редактировать</a>
+                                                    {% if profile.username == user %}
+                                                    <a class="btn btn-sm text-muted" href="/{{ profile.username }}/{{ post.id }}/edit" role="button">Редактировать</a>
                                                     {% endif %}
                                             </div>
                                             <!-- Дата публикации  -->

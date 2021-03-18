@@ -6,14 +6,14 @@ from django.urls import reverse
 
 class ProfileTest(TestCase):
     def setUp(self):
-        self.not_auth_client = Client()
-        self.auth_client = Client()
         self.user = User.objects.create_user(
             username='test_user',
             email='test@test.com',
             password='12345678'
         )
-        self.auth_client.login(username='test_user', password='12345678')
+        self.not_auth_client = Client()
+        self.auth_client = Client()
+        self.auth_client.force_login(self.user)
 
         #self.post = Post.objects.create(text='test text', author=self.user)
 
