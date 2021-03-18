@@ -47,7 +47,7 @@ def profile(request, username):
     return render(request, 'profile.html', {"profile": profile, 'page': page, 'paginator': paginator, "user": user})
 
 
-def post_view(request, username, post_id):
+def post_view(request, username, post_id):  # TODO: change author_post on post
     author = get_object_or_404(User, username=username)
     author_post = author.posts.get(id=post_id)
     author_post_list = author.posts.all()
@@ -60,7 +60,7 @@ def post_view(request, username, post_id):
 @login_required
 def post_edit(request, username, post_id):
     post = get_object_or_404(Post, id=post_id)
-    form = PostForm(request.POST or None, instance=post)
+    form = PostForm(request.POST or None, files=request.FILES or None, instance=post)
     if not form.is_valid():
         return render(request, 'new_post.html', {"form": form})
     post = form.save()
