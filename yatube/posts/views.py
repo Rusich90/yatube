@@ -56,25 +56,6 @@ def post_view(request, username, post_id):
 
     return render(request, 'post.html', {"author": author, 'author_post': author_post, 'paginator': paginator, "user": user})
 
-# @login_required
-# def post_edit(request, username, post_id):
-#     author = get_object_or_404(User, username=username)
-#     if author.username == request.user.username:
-#         post = get_object_or_404(Post, id=post_id)
-#         if request.method == "POST":
-#             form = PostForm(request.POST, instance=post)
-#             if form.is_valid():
-#                 post = form.save()
-#                 post.save()
-#                 return redirect('post', username=username, post_id=post_id)
-#
-#             return render(request, 'new_post.html', {"form": form})
-#
-#         form = PostForm(instance=post)
-#         return render(request, 'new_post.html', {"form": form})
-#
-#     return redirect('post', username=username, post_id=post_id)
-
 
 @login_required
 def post_edit(request, username, post_id):
@@ -85,3 +66,16 @@ def post_edit(request, username, post_id):
     post = form.save()
     post.save()
     return redirect('post', username=username, post_id=post_id)
+
+
+def page_not_found(request, exeption):
+    return render(
+        request,
+        'misc/404.html',
+        {'path': request.path},
+        status=404
+    )
+
+
+def server_error(request):
+    return render(request, 'misc/500.html', status=500)
