@@ -10,11 +10,11 @@
                         <div class="card-body">
                                 <div class="h2">
                                     <!-- Имя автора -->
-                                    {{ author.first_name }} {{ author.last_name }}
+                                    {{ post.author.first_name }} {{ post.author.last_name }}
                                 </div>
                                 <div class="h3 text-muted">
                                      <!-- username автора -->
-                                     @{{ author.username }}
+                                     @{{ post.author.username }}
                                 </div>
                         </div>
                         <ul class="list-group list-group-flush">
@@ -27,7 +27,7 @@
                                 <li class="list-group-item">
                                         <div class="h6 text-muted">
                                             <!--Количество записей -->
-                                            Записей: {{ paginator.count}}
+                                            Записей: {{ post_list.count}}
                                         </div>
                                 </li>
                         </ul>
@@ -39,25 +39,25 @@
             <!-- Пост -->
                 <div class="card mb-3 mt-1 shadow-sm">
                     {% load thumbnail %}
-                    {% thumbnail author_post.image "960x339" crop="center" upscale=True as im %}
+                    {% thumbnail post.image "960x339" crop="center" upscale=True as im %}
                         <img class="card-img" src="{{ im.url }}">
                     {% endthumbnail %}
                         <div class="card-body">
                                 <p class="card-text">
                                         <!-- Ссылка на страницу автора в атрибуте href; username автора в тексте ссылки -->
-                                        <a href="/{{ author.username }}/"><strong class="d-block text-gray-dark">@{{ author.username }}</strong></a>
+                                        <a href="/{{ post.author.username }}/"><strong class="d-block text-gray-dark">@{{ post.author.username }}</strong></a>
                                         <!-- Текст поста -->
-                                        {{ author_post.text|linebreaksbr }}
+                                        {{ post.text|linebreaksbr }}
                                 </p>
                                 <div class="d-flex justify-content-between align-items-center">
                                         <div class="btn-group ">
                                                 <!-- Ссылка на редактирование, показывается только автору записи -->
-                                                {% if author.username == user %}
-                                                <a class="btn btn-sm text-muted" href="/{{ author.username }}/{{ author_post.id }}/edit" role="button">Редактировать</a>
+                                                {% if post.author.username == request.user.username %}
+                                                <a class="btn btn-sm text-muted" href="/{{ post.author.username }}/{{ post.id }}/edit" role="button">Редактировать</a>
                                                 {% endif %}
                                         </div>
                                         <!-- Дата публикации  -->
-                                        <small class="text-muted">{{ author_post.pub_date|date:"d M Y г. H:i" }}</small>
+                                        <small class="text-muted">{{ post.pub_date|date:"d M Y г. H:i" }}</small>
                                 </div>
                         </div>
                 </div>

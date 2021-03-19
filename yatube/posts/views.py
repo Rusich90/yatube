@@ -42,19 +42,16 @@ def profile(request, username):
     paginator = Paginator(profile_post_list, 5)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
-    user = request.user.username
 
-    return render(request, 'profile.html', {"profile": profile, 'page': page, 'paginator': paginator, "user": user})
+    return render(request, 'profile.html', {"profile": profile, 'page': page, 'paginator': paginator})
 
 
-def post_view(request, username, post_id):  # TODO: change author_post on post
-    author = get_object_or_404(User, username=username)
-    author_post = author.posts.get(id=post_id)
-    author_post_list = author.posts.all()
-    paginator = Paginator(author_post_list, 5)
-    user = request.user.username
+def post_view(request, username, post_id):
+    profile = get_object_or_404(User, username=username)
+    post = get_object_or_404(Post, author=profile, pk=post_id)
+    post_list = profile.posts.all()
 
-    return render(request, 'post.html', {"author": author, 'author_post': author_post, 'paginator': paginator, "user": user})
+    return render(request, 'post.html', {'post': post, 'post_list': post_list})
 
 
 @login_required
