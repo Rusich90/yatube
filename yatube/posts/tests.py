@@ -1,5 +1,5 @@
 from django.test import TestCase, Client
-from .models import Post, User
+from .models import Post, User, Group
 from django.urls import reverse
 
 
@@ -14,8 +14,23 @@ class ProfileTest(TestCase):
         self.not_auth_client = Client()
         self.auth_client = Client()
         self.auth_client.force_login(self.user)
+        self.group = Group.objects.create(
+            title='test group',
+            slug='test_group',
+            description='test description'
+        )
 
-        #self.post = Post.objects.create(text='test text', author=self.user)
+
+    def _get_urls(self, post):
+        urls = [reverse('index'),
+                reverse('profile', kwargs={'username': post.author.username}),
+                reverse('post', kwargs={'username': post.author.username, 'post_id': post.id})]
+        return urls
+
+
+    def _check_post_on_page(self, url, post): # TODO: changed this function
+
+
 
     def test_profile(self):
         response = self.auth_client.get(reverse('profile', kwargs={'username': 'test_user'}))
@@ -46,4 +61,4 @@ class ProfileTest(TestCase):
         response_post = self.client.get('/test_user/1/')
         self.assertEqual(response_index.context['page'][0].text, 'edit test text')
         self.assertEqual(response_profile.context['page'][0].text, 'edit test text')
-        self.assertEqual(response_post.context['author_post'].text, 'edit test text')
+        self.assertEqual(response_post.context['post'].text, 'edit test text')
