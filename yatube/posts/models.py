@@ -49,3 +49,5 @@ class Comment(models.Model):
     def __str__(self):
         # выводим текст поста
         return self.text
+    class Meta:
+        ordering = ['-created']
