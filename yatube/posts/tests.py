@@ -1,7 +1,7 @@
 from django.test import TestCase, Client
 from .models import Post, User, Group
 from django.urls import reverse
-
+from django.core.cache import cache
 
 
 class ProfileTest(TestCase):
@@ -20,17 +20,22 @@ class ProfileTest(TestCase):
             description='test description'
         )
 
-
     def _get_urls(self, post):
         urls = [reverse('index'),
                 reverse('profile', kwargs={'username': post.author.username}),
-                reverse('post', kwargs={'username': post.author.username, 'post_id': post.id})]
+                reverse('post', kwargs={'username': post.author.username, 'post_id': post.id}),
+                reverse('group_posts', kwargs={'slug': post.group.slug})
+                ]
         return urls
 
-
-    def _check_post_on_page(self, url, post): # TODO: changed this function
-
-
+    def _check_post_on_page(self, url, post):
+        response = self.auth_client.get(url)
+        if "page" in response.context:
+            post_list = response.context['page'].object_list
+            self.assertEqual(len(post_list), 1)
+            self.assertEqual(post_list[0], post)
+        else:
+            self.assertEqual(response.context['post'], post)
 
     def test_profile(self):
         response = self.auth_client.get(reverse('profile', kwargs={'username': 'test_user'}))
@@ -47,18 +52,39 @@ class ProfileTest(TestCase):
         self.auth_client.post(reverse('new_post'), data={'text': 'test text'})
         response = self.auth_client.get(reverse('profile', kwargs={'username': 'test_user'}))
         self.assertEqual(len(response.context["page"]), 1)
-        self.assertEqual( response.context['page'][0].text, 'test text')
+        self.assertEqual(response.context['page'][0].text, 'test text')
+
+    def test_newpost_loggeduser2(self):
+        self.auth_client.post(reverse('new_post'),
+                              data={'text': 'test text',
+                                    'group': self.group.pk})
+        post = Post.objects.first()
+        urls = self._get_urls(post=post)
+        for url in urls:
+            self._check_post_on_page(url=url, post=post)
 
     def test_edit_post(self):
-        self.auth_client.post(reverse('new_post'), data={'text': 'test text'})
+        self.auth_client.post(reverse('new_post'),
+                              data={'text': 'test text'})
         self.auth_client.post(reverse('post_edit',
                                       kwargs={
                                           'username': self.user.username,
                                           'post_id': 1}),
-                                      data={'text': 'edit test text'})
-        response_index = self.client.get('/')
-        response_profile = self.client.get('/test_user/')
-        response_post = self.client.get('/test_user/1/')
-        self.assertEqual(response_index.context['page'][0].text, 'edit test text')
-        self.assertEqual(response_profile.context['page'][0].text, 'edit test text')
-        self.assertEqual(response_post.context['post'].text, 'edit test text')
+                                      data={'text': 'edit test text',
+                                            'group': self.group.pk})
+        post = Post.objects.first()
+        urls = self._get_urls(post)
+        for url in urls:
+            self._check_post_on_page(url, post)
+
+    def test_image_in_posts(self):
+        cache.clear()
+        with open('media/posts/test_img.png', 'rb') as img:
+            self.auth_client.post(reverse('new_post'),
+                                  data={'text': 'post with image', 'group': self.group.pk, 'image': img},
+                                  follow=True)
+            post = Post.objects.first()
+            urls = self._get_urls(post=post)
+            for url in urls:
+                response = self.auth_client.get(url)
+                self.assertContains(response, "<img")
