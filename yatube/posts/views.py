@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from .models import Post, Group, User
-from .forms import PostForm
+from .forms import PostForm, CommentForm
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 
@@ -11,8 +11,11 @@ def index(request):
     paginator = Paginator(post_list, 10)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
-
-    return render(request, 'index.html', {'page': page, 'paginator': paginator})
+    context = {
+        'page': page,
+        'paginator': paginator,
+    }
+    return render(request, 'index.html', context)
 
 
 def group_posts(request, slug):
@@ -21,8 +24,13 @@ def group_posts(request, slug):
     paginator = Paginator(group_post_list, 5)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
+    context = {
+        "group": group,
+        'page': page,
+        'paginator': paginator,
+    }
 
-    return render(request, "group.html", {"group": group, 'page': page, 'paginator': paginator})
+    return render(request, "group.html", context)
 
 
 @login_required
@@ -43,16 +51,32 @@ def profile(request, username):
     paginator = Paginator(profile_post_list, 5)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
-
-    return render(request, 'profile.html', {"profile": profile, 'page': page, 'paginator': paginator})
+    context = {
+        "profile": profile,
+        'page': page,
+        'paginator': paginator,
+    }
+    return render(request, 'profile.html', context)
 
 
 def post_view(request, username, post_id):
     profile = get_object_or_404(User, username=username)
     post = get_object_or_404(Post, author=profile, pk=post_id)
     post_list = profile.posts.all()
+    form = CommentForm(instance=None)
+    comments = post.comments.all()
+    paginator = Paginator(comments, 10)
+    page_number = request.GET.get('page')
+    items = paginator.get_page(page_number)
+    context = {
+        'items': items,
+        'form': form,
+        'post': post,
+        'post_list': post_list,
+        'paginator': paginator
+    }
 
-    return render(request, 'post.html', {'post': post, 'post_list': post_list})
+    return render(request, 'post.html', context)
 
 
 @login_required
@@ -68,6 +92,17 @@ def post_edit(request, username, post_id):
     form.save()
     return redirect('post', username=request.user.username, post_id=post_id)
 
+
+@login_required
+def add_comment(request, username, post_id):
+    post = get_object_or_404(Post, pk=post_id, author__username=username)
+    form = CommentForm(request.POST or None)
+    if form.is_valid():
+        comment = form.save(commit=False)
+        comment.post = post
+        comment.author = request.user
+        comment.save()
+    return redirect('post', username=username, post_id=post_id)
 
 def page_not_found(request, exeption):
     return render(

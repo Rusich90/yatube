@@ -61,6 +61,10 @@
                                 </div>
                         </div>
                 </div>
+            {% include 'comments.html' %}
+            {% if items.has_other_pages %}
+            {% include "paginator.html" with items=page paginator=paginator %}
+            {% endif %}
      </div>
     </div>
 </main>
