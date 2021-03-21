@@ -1,10 +1,11 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
-from .models import Post, Group, User
+from .models import Post, Group, User, Follow
 from .forms import PostForm, CommentForm
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.views.decorators.cache import cache_page
+from django.urls import reverse
 
 @cache_page(20, key_prefix='index_page')
 def index(request):
@@ -52,10 +53,12 @@ def profile(request, username):
     paginator = Paginator(profile_post_list, 5)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
+    following = request.user.follower.filter(author=profile).exists()
     context = {
         "profile": profile,
         'page': page,
         'paginator': paginator,
+        'following': following
     }
     return render(request, 'profile.html', context)
 
@@ -108,8 +111,8 @@ def add_comment(request, username, post_id):
 
 @login_required
 def follow_index(request):
-    post_list = Post.objects.all()
-    paginator = Paginator(post_list, 10)
+    fav_posts = Post.objects.filter(author__following__user=request.user)
+    paginator = Paginator(fav_posts, 10)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
     context = {
@@ -120,14 +123,17 @@ def follow_index(request):
 
 @login_required
 def profile_follow(request, username):
-    # ...
-    pass
+    profile = get_object_or_404(User, username=username)
+    Follow.objects.create(author=profile, user=request.user)
+    return redirect(reverse('profile', kwargs={'username': username}))
 
 
 @login_required
 def profile_unfollow(request, username):
-    # ...
-    pass
+    profile = get_object_or_404(User, username=username)
+    follow = Follow.objects.get(author=profile, user=request.user)
+    follow.delete()
+    return redirect(reverse('profile', kwargs={'username': username}))
 
 def page_not_found(request, exeption):
     return render(
