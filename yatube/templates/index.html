@@ -3,6 +3,9 @@
 
 {% block content %}
     <div class="container">
+
+        {% include "menu.html" with index=True %}
+
            <h1> Последние обновления на сайте</h1>
             <!-- Вывод ленты записей -->
                 {% for post in page %}

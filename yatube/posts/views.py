@@ -105,6 +105,30 @@ def add_comment(request, username, post_id):
         comment.save()
     return redirect('post', username=username, post_id=post_id)
 
+
+@login_required
+def follow_index(request):
+    post_list = Post.objects.all()
+    paginator = Paginator(post_list, 10)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+    context = {
+        'page': page,
+        'paginator': paginator,
+    }
+    return render(request, 'follow.html', context)
+
+@login_required
+def profile_follow(request, username):
+    # ...
+    pass
+
+
+@login_required
+def profile_unfollow(request, username):
+    # ...
+    pass
+
 def page_not_found(request, exeption):
     return render(
         request,
