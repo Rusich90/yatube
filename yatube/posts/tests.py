@@ -1,5 +1,5 @@
 from django.test import TestCase, Client
-from .models import Post, User, Group
+from .models import Post, User, Group, Comment
 from django.urls import reverse
 from django.core.cache import cache
 
@@ -43,18 +43,19 @@ class ProfileTest(TestCase):
         self.assertIsInstance(response.context["profile"], User)
         self.assertEqual(response.context["profile"].username, self.user.username)
 
-    def test_newpost_notlogged(self):
+    def test_new_post_not_logged_user(self):
         self.not_auth_client.post(reverse('new_post'), data={'text': 'test text'})
         response = self.not_auth_client.get(reverse('profile', kwargs={'username': 'test_user'}))
         self.assertEqual(len(response.context["page"]), 0)
 
-    def test_newpost_loggeduser(self):
+    def test_new_post_logged_user(self):
         self.auth_client.post(reverse('new_post'), data={'text': 'test text'})
         response = self.auth_client.get(reverse('profile', kwargs={'username': 'test_user'}))
         self.assertEqual(len(response.context["page"]), 1)
         self.assertEqual(response.context['page'][0].text, 'test text')
 
-    def test_newpost_loggeduser2(self):
+    def test_new_post_logged_user2(self):
+        cache.clear()
         self.auth_client.post(reverse('new_post'),
                               data={'text': 'test text',
                                     'group': self.group.pk})
@@ -64,6 +65,7 @@ class ProfileTest(TestCase):
             self._check_post_on_page(url=url, post=post)
 
     def test_edit_post(self):
+        cache.clear()
         self.auth_client.post(reverse('new_post'),
                               data={'text': 'test text'})
         self.auth_client.post(reverse('post_edit',
@@ -88,3 +90,34 @@ class ProfileTest(TestCase):
             for url in urls:
                 response = self.auth_client.get(url)
                 self.assertContains(response, "<img")
+
+    def test_comment_in_post(self):
+        self.auth_client.post(reverse('new_post'),
+                              data={'text': 'test text',
+                                    'group': self.group.pk})
+        self.auth_client.post(reverse('add_comment',
+                              kwargs={
+                                  'username': self.user.username,
+                                  'post_id': 1}),
+                              data={'text': 'test comment'})
+        post = Post.objects.first()
+        comment = Comment.objects.first()
+        url = reverse('post', kwargs={'username': post.author.username, 'post_id': post.id})
+        response = self.auth_client.get(url)
+        self.assertEqual(response.context['items'][0], comment)
+
+    def test_cache_index(self):
+        self.auth_client.post(reverse('new_post'),
+                              data={'text': 'test text',
+                                    'group': self.group.pk})
+        url = (reverse('index'))
+        response = self.auth_client.get(url)
+        self.assertEqual(len(response.context['page'].object_list), 1)
+        self.auth_client.post(reverse('new_post'),
+                              data={'text': 'test text_2',
+                                    'group': self.group.pk})
+        #response2 = self.not_auth_client.get(url)
+        #self.assertEqual(len(response2.context['page'].object_list), 1)
+        cache.clear()
+        response3 = self.auth_client.get(url)
+        self.assertEqual(len(response3.context['page'].object_list), 2)
