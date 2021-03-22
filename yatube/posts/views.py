@@ -53,7 +53,9 @@ def profile(request, username):
     paginator = Paginator(profile_post_list, 5)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
-    following = request.user.follower.filter(author=profile).exists()
+    following = False
+    if request.user.is_authenticated:
+        following = request.user.follower.filter(author=profile).exists()
     context = {
         "profile": profile,
         'page': page,
@@ -123,13 +125,13 @@ def follow_index(request):
 
 @login_required
 def profile_follow(request, username):
-    profile = get_object_or_404(User, username=username)
-    if profile == request.user:
+    author = get_object_or_404(User, username=username)
+    if author == request.user:
         return redirect(reverse('profile', kwargs={'username': username}))
-    if request.user.follower.filter(author=profile).exists():
+    if request.user.follower.filter(author=author).exists():
         return redirect(reverse('profile', kwargs={'username': username}))
-    Follow.objects.create(author=profile, user=request.user)
-    return redirect(reverse('profile', kwargs={'username': username}))
+    Follow.objects.create(author=author, user=request.user)
+    return redirect('profile', username=username)
 
 
 @login_required
@@ -137,7 +139,8 @@ def profile_unfollow(request, username):
     profile = get_object_or_404(User, username=username)
     follow = Follow.objects.get(author=profile, user=request.user)
     follow.delete()
-    return redirect(reverse('profile', kwargs={'username': username}))
+    return redirect('profile', username=username)
+
 
 def page_not_found(request, exeption):
     return render(
