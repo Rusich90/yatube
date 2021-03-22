@@ -30,6 +30,7 @@
                                                 Записей: {{ paginator.count}}
                                             </div>
                                     </li>
+                                    {% if user != profile %}
                                     <li class="list-group-item">
                                       {% if following %}
                                       <a class="btn btn-lg btn-light"
@@ -43,6 +44,7 @@
                                       </a>
                                       {% endif %}
                                     </li>
+                                    {% endif %}
                             </ul>
                     </div>
             </div>
