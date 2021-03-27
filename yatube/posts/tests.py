@@ -30,8 +30,8 @@ class ProfileTest(TestCase):
 
     def _check_post_on_page(self, url, post):
         response = self.auth_client.get(url)
-        if "page" in response.context:
-            post_list = response.context['page'].object_list
+        if "page_obj" in response.context:
+            post_list = response.context['page_obj'].object_list
             self.assertEqual(len(post_list), 1)
             self.assertEqual(post_list[0], post)
         else:
@@ -112,7 +112,7 @@ class ProfileTest(TestCase):
                                     'group': self.group.pk})
         url = (reverse('index'))
         response = self.auth_client.get(url)
-        self.assertEqual(len(response.context['page'].object_list), 1)
+        self.assertEqual(len(response.context['page_obj'].object_list), 1)
         self.auth_client.post(reverse('new_post'),
                               data={'text': 'test text_2',
                                     'group': self.group.pk})
@@ -120,4 +120,4 @@ class ProfileTest(TestCase):
         #self.assertEqual(len(response2.context['page'].object_list), 1)
         cache.clear()
         response3 = self.auth_client.get(url)
-        self.assertEqual(len(response3.context['page'].object_list), 2)
+        self.assertEqual(len(response3.context['page_obj'].object_list), 2)

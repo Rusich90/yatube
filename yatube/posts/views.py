@@ -6,18 +6,30 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.views.decorators.cache import cache_page
 from django.urls import reverse
+from django.views.generic import (
+    ListView,
+    DetailView
+)
 
-@cache_page(20, key_prefix='index_page')
-def index(request):
-    post_list = Post.objects.all()
-    paginator = Paginator(post_list, 10)
-    page_number = request.GET.get('page')
-    page = paginator.get_page(page_number)
-    context = {
-        'page': page,
-        'paginator': paginator,
-    }
-    return render(request, 'index.html', context)
+
+
+
+# def index(request):
+#     post_list = Post.objects.all()
+#     paginator = Paginator(post_list, 10)
+#     page_number = request.GET.get('page')
+#     page = paginator.get_page(page_number)
+#     context = {
+#         'page': page,
+#         'paginator': paginator,
+#     }
+#     return render(request, 'index.html', context)
+
+
+class IndexView(ListView):
+    model = Post
+    template_name = 'index.html'
+    paginate_by = 10
 
 
 def group_posts(request, slug):
@@ -34,6 +46,9 @@ def group_posts(request, slug):
 
     return render(request, "group.html", context)
 
+
+# class GroupView(ListView):
+#     model = Group
 
 @login_required
 def new_post(request):
@@ -84,6 +99,12 @@ def post_view(request, username, post_id):
 
     return render(request, 'post.html', context)
 
+
+# class PostView(DetailView):
+#     model = Post
+#     template_name = 'post.html'
+#     slug_url_kwarg = 'username'
+#     pk_url_kwarg = 'post_id'
 
 @login_required
 def post_edit(request, username, post_id):
