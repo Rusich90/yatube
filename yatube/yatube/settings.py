@@ -38,6 +38,7 @@ ALLOWED_HOSTS = [
 INSTALLED_APPS = [
     'users',
     'posts',
+    'api',
     'django.contrib.sites',
     'django.contrib.flatpages',
     'django.contrib.admin',
@@ -48,6 +49,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'sorl.thumbnail',
     'debug_toolbar',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
