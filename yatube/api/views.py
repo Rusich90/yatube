@@ -3,23 +3,22 @@ from posts.models import Post, Comment
 from .serializers import PostSerializer, CommentSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from rest_framework.permissions import BasePermission, IsAuthenticated
-# class CommentViewSet(viewsets.ModelViewSet):
-#     queryset = Comment.objects.filter(post=id)
-#     serializer_class = CommentSerializer
-
-class OwnResourcePermission(BasePermission):
-
-    def has_object_permission(self, request, view, obj):
-        if request.method in ('PUT', 'PATCH', 'DELETE'):
-            return request.user == obj.author
-        return True
+from rest_framework.permissions import IsAuthenticated
+from .permissions import OwnResourcePermission
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters
+from .filters import PostFilter
 
 
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = [OwnResourcePermission, IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filter_fields = ['text', ]
+    search_fields = ['text', ]
+    ordering_fields = ['pub_date', 'author']
+    filter_class = PostFilter
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
