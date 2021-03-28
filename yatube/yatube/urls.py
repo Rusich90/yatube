@@ -20,6 +20,7 @@ from django.conf.urls import handler404, handler500
 from django.conf import settings
 from django.conf.urls.static import static
 
+
 handler404 = 'posts.views.page_not_found' # noqa
 handler500 = 'posts.views.server_error' # noqa
 
@@ -31,9 +32,8 @@ urlpatterns = [
         # регистрация и авторизация
         path('auth/', include('users.urls')),
         path('auth/', include('django.contrib.auth.urls')),
-        # импорт из приложения posts
-        path('', include('posts.urls')),
         path('api/', include('api.urls')),
+        path('', include('posts.urls')),
 ]
 
 
@@ -43,6 +43,7 @@ urlpatterns += [
         path('about-author/', views.flatpage, {'url': '/about-author/'}, name='author'),
         path('about-spec/', views.flatpage, {'url': '/about-spec/'}, name='spec'),
 ]
+
 
 
 if settings.DEBUG:
