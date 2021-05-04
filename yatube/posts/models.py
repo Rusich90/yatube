@@ -44,7 +44,7 @@ class Comment(models.Model):
     text = models.TextField(verbose_name='Текст', help_text='Введите текст')
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="comments")
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="comments")
-    created = models.DateTimeField("date comment", auto_now_add=True)
+    created = models.DateTimeField("date comment", auto_now_add=True, db_index=True)
 
     def __str__(self):
         # выводим текст поста
