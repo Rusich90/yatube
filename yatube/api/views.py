@@ -1,16 +1,18 @@
 from rest_framework import viewsets, filters
 from posts.models import Post, Comment, Follow, Group, User
-from .serializers import PostSerializer, CommentSerializer, FollowSerializer, GroupSerializer
-from rest_framework.permissions import BasePermission, IsAuthenticatedOrReadOnly
+from .serializers import (PostSerializer, CommentSerializer,
+                          FollowSerializer, GroupSerializer)
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from django_filters.rest_framework import DjangoFilterBackend
 from .permissions import OwnResourcePermission
+
 
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticatedOrReadOnly, OwnResourcePermission]
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ["group", ]
+    filterset_fields = ['group', ]
 
     def perform_create(self, serializer):
         print(serializer.validated_data)
@@ -27,7 +29,8 @@ class CommentViewSet(viewsets.ModelViewSet):
         )
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user, post=Post.objects.get(id=self.kwargs['post_id']))
+        serializer.save(author=self.request.user,
+                        post=Post.objects.get(id=self.kwargs['post_id']))
 
 
 class FollowViewSet(viewsets.ModelViewSet):
@@ -35,14 +38,7 @@ class FollowViewSet(viewsets.ModelViewSet):
     serializer_class = FollowSerializer
     permission_classes = [IsAuthenticatedOrReadOnly, OwnResourcePermission]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    search_fields = ["=user__username", "=following__username"]
-
-    # def create(self, request, *args, **kwargs):
-    #     serializer = self.get_serializer(data=request.data)
-    #     serializer.is_valid(raise_exception=True)
-    #     self.perform_create(serializer)
-    #     headers = self.get_success_headers(serializer.data)
-    #     return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+    search_fields = ['=user__username', '=following__username']
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)

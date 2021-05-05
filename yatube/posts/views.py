@@ -1,29 +1,12 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse
 from .models import Post, Group, User, Follow
 from .forms import PostForm, CommentForm
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.views.decorators.cache import cache_page
 from django.urls import reverse
 from django.views.generic import (
     ListView,
-    DetailView
 )
-
-
-
-
-# def index(request):
-#     post_list = Post.objects.all()
-#     paginator = Paginator(post_list, 10)
-#     page_number = request.GET.get('page')
-#     page = paginator.get_page(page_number)
-#     context = {
-#         'page': page,
-#         'paginator': paginator,
-#     }
-#     return render(request, 'index.html', context)
 
 
 class IndexView(ListView):
@@ -39,26 +22,24 @@ def group_posts(request, slug):
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
     context = {
-        "group": group,
+        'group': group,
         'page': page,
         'paginator': paginator,
     }
 
-    return render(request, "group.html", context)
+    return render(request, 'group.html', context)
 
-
-# class GroupView(ListView):
-#     model = Group
 
 @login_required
 def new_post(request):
     form = PostForm(request.POST or None, files=request.FILES or None)
     if not form.is_valid():
-        return render(request, 'new_post.html', {"form": form})
+        return render(request, 'new_post.html', {'form': form})
     text = form.cleaned_data['text']
     group = form.cleaned_data['group']
     image = form.cleaned_data['image']
-    Post.objects.create(author=request.user, group=group, text=text, image=image)
+    Post.objects.create(author=request.user, group=group, text=text,
+                        image=image)
     return redirect('index')
 
 
@@ -72,7 +53,7 @@ def profile(request, username):
     if request.user.is_authenticated:
         following = request.user.follower.filter(author=profile).exists()
     context = {
-        "profile": profile,
+        'profile': profile,
         'page': page,
         'paginator': paginator,
         'following': following
@@ -100,12 +81,6 @@ def post_view(request, username, post_id):
     return render(request, 'post.html', context)
 
 
-# class PostView(DetailView):
-#     model = Post
-#     template_name = 'post.html'
-#     slug_url_kwarg = 'username'
-#     pk_url_kwarg = 'post_id'
-
 @login_required
 def post_edit(request, username, post_id):
     profile = get_object_or_404(User, username=username)
@@ -115,7 +90,7 @@ def post_edit(request, username, post_id):
     form = PostForm(request.POST or None, files=request.FILES or None,
                     instance=post)
     if not form.is_valid():
-        return render(request, 'new_post.html', {"form": form, "post": post})
+        return render(request, 'new_post.html', {'form': form, 'post': post})
     form.save()
     return redirect('post', username=request.user.username, post_id=post_id)
 
@@ -143,6 +118,7 @@ def follow_index(request):
         'paginator': paginator,
     }
     return render(request, 'follow.html', context)
+
 
 @login_required
 def profile_follow(request, username):

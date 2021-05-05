@@ -23,7 +23,8 @@ class ProfileTest(TestCase):
     def _get_urls(self, post):
         urls = [reverse('index'),
                 reverse('profile', kwargs={'username': post.author.username}),
-                reverse('post', kwargs={'username': post.author.username, 'post_id': post.id}),
+                reverse('post', kwargs={'username': post.author.username,
+                                        'post_id': post.id}),
                 reverse('group_posts', kwargs={'slug': post.group.slug})
                 ]
         return urls
@@ -38,19 +39,24 @@ class ProfileTest(TestCase):
             self.assertEqual(response.context['post'], post)
 
     def test_profile(self):
-        response = self.auth_client.get(reverse('profile', kwargs={'username': 'test_user'}))
+        response = self.auth_client.get(reverse('profile',
+                                                kwargs={'username': 'test_user'}))
         self.assertEqual(response.status_code, 200)
         self.assertIsInstance(response.context["profile"], User)
-        self.assertEqual(response.context["profile"].username, self.user.username)
+        self.assertEqual(response.context["profile"].username,
+                         self.user.username)
 
     def test_new_post_not_logged_user(self):
-        self.not_auth_client.post(reverse('new_post'), data={'text': 'test text'})
-        response = self.not_auth_client.get(reverse('profile', kwargs={'username': 'test_user'}))
+        self.not_auth_client.post(reverse('new_post'),
+                                  data={'text': 'test text'})
+        response = self.not_auth_client.get(reverse('profile',
+                                                    kwargs={'username': 'test_user'}))
         self.assertEqual(len(response.context["page"]), 0)
 
     def test_new_post_logged_user(self):
         self.auth_client.post(reverse('new_post'), data={'text': 'test text'})
-        response = self.auth_client.get(reverse('profile', kwargs={'username': 'test_user'}))
+        response = self.auth_client.get(reverse('profile',
+                                                kwargs={'username': 'test_user'}))
         self.assertEqual(len(response.context["page"]), 1)
         self.assertEqual(response.context['page'][0].text, 'test text')
 
@@ -83,7 +89,8 @@ class ProfileTest(TestCase):
         cache.clear()
         with open('media/posts/test_img.png', 'rb') as img:
             self.auth_client.post(reverse('new_post'),
-                                  data={'text': 'post with image', 'group': self.group.pk, 'image': img},
+                                  data={'text': 'post with image',
+                                        'group': self.group.pk, 'image': img},
                                   follow=True)
             post = Post.objects.first()
             urls = self._get_urls(post=post)
@@ -102,7 +109,8 @@ class ProfileTest(TestCase):
                               data={'text': 'test comment'})
         post = Post.objects.first()
         comment = Comment.objects.first()
-        url = reverse('post', kwargs={'username': post.author.username, 'post_id': post.id})
+        url = reverse('post', kwargs={'username': post.author.username,
+                                      'post_id': post.id})
         response = self.auth_client.get(url)
         self.assertEqual(response.context['items'][0], comment)
 
