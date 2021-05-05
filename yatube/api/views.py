@@ -1,67 +1,53 @@
-from rest_framework import viewsets, status
-from posts.models import Post, Comment
-from .serializers import PostSerializer, CommentSerializer
-from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from rest_framework.permissions import IsAuthenticated
-from .permissions import OwnResourcePermission
+from rest_framework import viewsets, filters
+from posts.models import Post, Comment, Follow, Group, User
+from .serializers import PostSerializer, CommentSerializer, FollowSerializer, GroupSerializer
+from rest_framework.permissions import BasePermission, IsAuthenticatedOrReadOnly
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters
-from .filters import PostFilter
-
+from .permissions import OwnResourcePermission
 
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    permission_classes = [OwnResourcePermission, IsAuthenticated]
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filter_fields = ['text', ]
-    search_fields = ['text', ]
-    ordering_fields = ['pub_date', 'author']
-    filter_class = PostFilter
+    permission_classes = [IsAuthenticatedOrReadOnly, OwnResourcePermission]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["group", ]
 
     def perform_create(self, serializer):
+        print(serializer.validated_data)
         serializer.save(author=self.request.user)
 
 
-@api_view(['GET', 'POST'])
-def api_comments(request, pk):
-    if request.method == 'GET':
-        comments = Comment.objects.filter(post=pk)
-        serializer = CommentSerializer(comments, many=True)
-        return Response(serializer.data)
-    elif request.method == 'POST':
-        serializer = CommentSerializer(data=request.data)
-        post = Post.objects.get(id=pk)
-        if serializer.is_valid():
-            serializer.save(author=request.user, post=post)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class CommentViewSet(viewsets.ModelViewSet):
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly, OwnResourcePermission]
+
+    def get_queryset(self):
+        return Comment.objects.filter(
+            post=self.kwargs['post_id']
+        )
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user, post=Post.objects.get(id=self.kwargs['post_id']))
 
 
-@api_view(['GET', 'PUT', 'PATCH', 'DELETE'])
-def api_comments_edit(request, pk, cpk):
-    if request.method == 'GET':
-        comment = Comment.objects.get(id=cpk)
-        serializer = CommentSerializer(comment)
-        return Response(serializer.data)
-    elif request.method == 'PUT':
-        comment = Comment.objects.get(id=cpk)
-        serializer = CommentSerializer(comment, data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response(serializer.data)
-    elif request.method == 'PATCH':
-        comment = Comment.objects.get(id=cpk)
-        if request.user != comment.author:
-            return Response(status=status.HTTP_403_FORBIDDEN)
-        serializer = CommentSerializer(comment, data=request.data, partial=True)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response(serializer.data)
-    elif request.method == 'DELETE':
-        comment = Comment.objects.get(id=cpk)
-        if request.user == comment.author:
-            comment.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response(status=status.HTTP_403_FORBIDDEN)
+class FollowViewSet(viewsets.ModelViewSet):
+    queryset = Follow.objects.all()
+    serializer_class = FollowSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly, OwnResourcePermission]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    search_fields = ["=user__username", "=following__username"]
+
+    # def create(self, request, *args, **kwargs):
+    #     serializer = self.get_serializer(data=request.data)
+    #     serializer.is_valid(raise_exception=True)
+    #     self.perform_create(serializer)
+    #     headers = self.get_success_headers(serializer.data)
+    #     return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class GroupViewSet(viewsets.ModelViewSet):
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer

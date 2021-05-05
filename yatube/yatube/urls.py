@@ -32,7 +32,7 @@ urlpatterns = [
         # регистрация и авторизация
         path('auth/', include('users.urls')),
         path('auth/', include('django.contrib.auth.urls')),
-        path('api/', include('api.urls')),
+        path('api/v1/', include('api.urls')),
         path('', include('posts.urls')),
 ]
 
