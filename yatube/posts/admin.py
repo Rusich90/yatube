@@ -9,10 +9,12 @@ class PostAdmin(admin.ModelAdmin):
     list_filter = ("pub_date", "group",)
     empty_value_display = "-пусто-"
 
+
 class GroupAdmin(admin.ModelAdmin):
     list_display = ("pk", "title", "description", "slug")
     search_fields = ("slug",)
     empty_value_display = "-пусто-"
+
 
 class CommentAdmin(admin.ModelAdmin):
     list_display = ("pk", "text", "author", "post", "created")
@@ -20,10 +22,12 @@ class CommentAdmin(admin.ModelAdmin):
     list_filter = ("post", "created",)
     empty_value_display = "-пусто-"
 
-# class FollowAdmin(admin.ModelAdmin):
-#     list_display = ("user", "following")
+
+class FollowAdmin(admin.ModelAdmin):
+    list_display = ("user", "following")
+
 
 admin.site.register(Post, PostAdmin)
 admin.site.register(Group, GroupAdmin)
 admin.site.register(Comment, CommentAdmin)
-# admin.site.register(Follow, FollowAdmin)
+admin.site.register(Follow, FollowAdmin)
