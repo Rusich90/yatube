@@ -23,7 +23,7 @@ class CommentAdmin(admin.ModelAdmin):
 
 
 class FollowAdmin(admin.ModelAdmin):
-    list_display = ('user', 'following')
+    list_display = ('user', 'author')
 
 
 admin.site.register(Post, PostAdmin)
