@@ -139,7 +139,7 @@ def profile_unfollow(request, username):
     return redirect('profile', username=username)
 
 
-def page_not_found(request, exeption):
+def page_not_found(request, exception):
     return render(
         request,
         'misc/404.html',

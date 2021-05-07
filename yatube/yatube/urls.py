@@ -24,6 +24,7 @@ from django.conf.urls.static import static
 handler404 = 'posts.views.page_not_found' # noqa
 handler500 = 'posts.views.server_error' # noqa
 
+
 urlpatterns = [
         # раздел администратора
         path('admin/', admin.site.urls),
