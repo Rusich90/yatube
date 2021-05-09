@@ -21,22 +21,18 @@ env = environ.Env()
 environ.Env.read_env()
 
 
-sentry_sdk.init(
-    dsn=env('SENTRY_DSN'),
-    integrations=[DjangoIntegration()],
-)
+# sentry_sdk.init(
+#     dsn=env('SENTRY_DSN'),
+#     integrations=[DjangoIntegration()],
+# )
 
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env('SECRET_KEY')
+SECRET_KEY = 'd0%1d7$d-&o6!9+_4a3ia=)m#d*a8h7lo=42xx2@yb(*v+z)f0'
 
-# SECURITY WARNING: don't run with debug turned on in production!
+
 DEBUG = True
 
 ALLOWED_HOSTS = [
