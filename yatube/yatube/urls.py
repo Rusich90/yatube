@@ -19,6 +19,7 @@ from django.contrib.flatpages import views
 from django.conf.urls import handler404, handler500
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.generic import TemplateView
 
 
 handler404 = 'posts.views.page_not_found' # noqa
@@ -33,6 +34,8 @@ urlpatterns = [
         path('about-author/', views.flatpage, {'url': '/about-author/'}, name='author'),
         path('about-spec/', views.flatpage, {'url': '/about-spec/'}, name='spec'),
         path('contacts/', views.flatpage, {'url': '/contacts/'}, name='contacts'),
+        path('redoc/', TemplateView.as_view(template_name='redoc.html'),
+             name='redoc'),
         path('', include('posts.urls')),
 ]
 
