@@ -9,6 +9,8 @@
 * REST API
 * SQL
 * HTML
+* JWT Token
+* smtp gmail
 * Linux
 * Gunicorn, NGINX
 * Удаленный сервер, доменные имена, SSL сертификаты
