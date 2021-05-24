@@ -35,6 +35,14 @@
  
  ```$ python -m venv venv```
  
+  Активируем виртуальное окружение
+ 
+ ```$ source venv/Scripts/activate```
+ 
+ Переходм в папку polls
+ 
+ ```$ cd yatube/```
+ 
  Устанавливаем зависимости:
 
 ```$ pip install -r requirements.txt```
